@@ -2,6 +2,7 @@
 
 
 #include "PlayerCharacter.h"
+#include "NPC1.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/CameraActor.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -23,21 +24,43 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//const FVector InitialRotation = GetActorForwardVector();
 }
 
 void APlayerCharacter::WalkForward(float Value)
 {
-	FVector Direction = GetActorForwardVector();
+	const FVector Direction = GetActorForwardVector();
 
 	AddMovementInput(Direction, Value);
+	
+	//if ((Controller != nullptr) && (Value != 0.0f))
+	//{
+	//	// find out which way is forward
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	//	// get forward vector
+	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//	AddMovementInput(Direction, Value);
+	//}
 }
 
 void APlayerCharacter::WalkRight(float Value)
 {
-	FVector Direction = GetActorRightVector();
-
+	const FVector Direction = GetActorRightVector();
+	
 	AddMovementInput(Direction, Value);
+	//if ((Controller != nullptr) && (Value != 0.0f))
+	//{
+	//	// find out which way is forward
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	//	// get forward vector
+	//	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	//	AddMovementInput(Direction, Value);
+	//}
+	
 }
 
 // Called every frame
@@ -56,5 +79,34 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("WalkRight", this, &APlayerCharacter::WalkRight);
 	// Character function jump
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &APlayerCharacter::InteractWithNPC);
 }
 
+void APlayerCharacter::InteractWithNPC()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Interaction test"));
+	TArray<AActor*> Result;
+
+	GetOverlappingActors(Result, ANPC1::StaticClass());
+	UINT8 Len = Result.Num();
+	for (size_t i = 0; i < Len; i++)
+	{
+		if (Result[i]->IsA(ANPC1::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Found interaction, %i"), ChatBubbleIndex);
+			if (Cast <ANPC1>(Result[i])->ChatBubbleIndex >= 10)
+			{
+				ChatBubbleIndex = 0;
+				Cast <ANPC1>(Result[i])->ChatBubbleIndex = 0;
+				UE_LOG(LogTemp, Warning, TEXT("reset val, %i"), ChatBubbleIndex);
+			}
+			else
+			{
+				ChatBubbleIndex = Cast <ANPC1>(Result[i])->ChatBubbleIndex++;
+				UE_LOG(LogTemp, Warning, TEXT("++, %i"), ChatBubbleIndex);
+			}
+		}
+	}
+
+
+}

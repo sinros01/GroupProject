@@ -21,6 +21,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Chat Settings")
+		int ChatBubbleIndex = 0;
+
+	void InteractWithNPC();
+
+
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -30,7 +38,7 @@ private:
 	//Input functions
 	void WalkForward(float Value);
 	void WalkRight(float Value);
-
+	//FVector InitialRotation;
 
 	//Setting up camera
 	UPROPERTY(EditAnywhere, Category = "Settings")
